@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
 
 const Dashboard = lazy(() => import('./routes/Dashboard'))
@@ -18,7 +18,7 @@ const Settings = lazy(() => import('./routes/Settings'))
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Suspense fallback={<div className="ambient min-h-screen" />}>
         <Routes>
           <Route element={<AppLayout />}>
@@ -38,6 +38,6 @@ export default function App() {
           </Route>
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
