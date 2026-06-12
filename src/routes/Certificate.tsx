@@ -6,6 +6,7 @@ import {
 import { GlassCard, SectionTitle, Pill, ProgressBar, ScoreRing } from '../components/ui'
 import { MrSavvy, SavvySays } from '../components/MrSavvy'
 import { cn, ar } from '../lib/cn'
+import { toast } from '../lib/toast'
 import { CERTIFICATE, USER, CERT_STATS } from '../data'
 
 // ─── Requirement checklist derived from CERT_STATS + USER ────────────────────
@@ -466,6 +467,7 @@ export default function Certificate() {
               color: 'rgba(255,255,255,0.7)',
             }}
             type="button"
+            onClick={() => toast('تم نسخ رابط الإنجاز للمشاركة 🔗', 'success')}
           >
             <Share2 className="h-4 w-4" />
             مشاركة الإنجاز
@@ -478,6 +480,7 @@ export default function Certificate() {
               color: '#f5c451',
             }}
             type="button"
+            onClick={() => { toast('جارٍ تجهيز الشهادة للطباعة/الحفظ…', 'info'); setTimeout(() => window.print(), 400) }}
           >
             <Download className="h-4 w-4" />
             تحميل الشهادة
@@ -489,6 +492,7 @@ export default function Certificate() {
               color: '#1a1200',
             }}
             type="button"
+            onClick={() => window.print()}
           >
             <Eye className="h-4 w-4" />
             عرض الشهادة

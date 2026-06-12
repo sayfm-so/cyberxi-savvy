@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { PlayCircle, Clock, Star } from 'lucide-react'
 import { GlassCard, SectionTitle, Pill } from '../components/ui'
+import { toast } from '../lib/toast'
 import { ar } from '../lib/cn'
 
 const LEVELS = ['الكل', 'مبتدئ', 'متوسط', 'متقدّم'] as const
@@ -37,7 +38,8 @@ export default function Videos() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {list.map((v, i) => (
           <motion.div key={v.title} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <GlassCard glow="cyber" className="overflow-hidden group">
+            <GlassCard glow="cyber" className="overflow-hidden group cursor-pointer"
+              onClick={() => toast(`▶ تشغيل: ${v.title}`, 'info')}>
               <div className="relative h-36 grid place-items-center bg-gradient-to-br from-cyber-900/60 to-violet-500/10">
                 <PlayCircle className="h-12 w-12 text-white/80 group-hover:text-savvy-400 transition-colors" />
                 {v.watched && <span className="absolute top-3 right-3"><Pill accent="savvy"><Star className="h-3 w-3" />تمّت</Pill></span>}

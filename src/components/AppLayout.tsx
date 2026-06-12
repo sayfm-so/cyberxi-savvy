@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, Route, BookOpen, PlayCircle, ListChecks, Target, Crosshair, Sparkles,
   Boxes, Award, LayoutDashboard, BarChart3, Settings, Menu, X, Search, Bell, Flame,
+  CheckCircle2, Info, AlertTriangle,
 } from 'lucide-react'
 import { NAV, USER } from '../data'
 import { cn, ar } from '../lib/cn'
 import { MrSavvy } from './MrSavvy'
+import type { ToastDetail } from '../lib/toast'
 
 const ICONS: Record<string, typeof Home> = {
   Home, Route, BookOpen, PlayCircle, ListChecks, Target, Crosshair, Sparkles,
@@ -20,6 +22,7 @@ export function AppLayout() {
 
   return (
     <div className="ambient grain min-h-screen text-white">
+      <Toaster />
       <div className="grid-faint min-h-screen lg:grid lg:grid-cols-[268px_1fr]">
         {/* sidebar (desktop) */}
         <aside className="hidden lg:flex flex-col gap-2 p-4 sticky top-0 h-screen overflow-y-auto border-l border-white/8">
@@ -113,6 +116,40 @@ function LevelCard() {
         <div className="h-full rounded-full bg-savvy-grad" style={{ width: `${pct}%` }} />
       </div>
       <p className="mt-1.5 text-[11px] text-white/45">{ar(USER.xp)} / {ar(USER.xpToNext)} XP</p>
+    </div>
+  )
+}
+
+function Toaster() {
+  const [items, setItems] = useState<{ id: number; detail: ToastDetail }[]>([])
+  useEffect(() => {
+    let n = 0
+    function onToast(e: Event) {
+      const detail = (e as CustomEvent<ToastDetail>).detail
+      const id = ++n
+      setItems(prev => [...prev, { id, detail }])
+      window.setTimeout(() => setItems(prev => prev.filter(i => i.id !== id)), 3200)
+    }
+    window.addEventListener('cxs-toast', onToast)
+    return () => window.removeEventListener('cxs-toast', onToast)
+  }, [])
+  const ICON = { info: Info, success: CheckCircle2, warn: AlertTriangle }
+  const COL = { info: 'text-cyber-400', success: 'text-savvy-400', warn: 'text-gold-400' }
+  return (
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none">
+      <AnimatePresence>
+        {items.map(({ id, detail }) => {
+          const Icon = ICON[detail.kind]
+          return (
+            <motion.div key={id} initial={{ opacity: 0, y: 20, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.9 }} transition={{ duration: 0.25 }}
+              className="glass-strong rounded-xl px-4 py-3 flex items-center gap-2.5 shadow-card max-w-[90vw]">
+              <Icon className={cn('h-5 w-5 shrink-0', COL[detail.kind])} />
+              <span className="text-sm text-white/90">{detail.msg}</span>
+            </motion.div>
+          )
+        })}
+      </AnimatePresence>
     </div>
   )
 }
