@@ -59,8 +59,8 @@ export function AppLayout() {
           <main className="flex-1 min-w-0">
             <AnimatePresence mode="wait">
               <motion.div key={loc.pathname}
-                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] as const }}
                 className="p-5 sm:p-7 max-w-[1280px] mx-auto w-full">
                 <Outlet />
               </motion.div>
@@ -75,10 +75,10 @@ export function AppLayout() {
 function Brand() {
   return (
     <div className="flex items-center gap-3 px-2 py-1">
-      <MrSavvy size={42} float={false} />
+      <MrSavvy size={36} float={false} />
       <div className="leading-none">
-        <p className="font-display font-extrabold text-lg text-white">CyberXi <span className="text-grad-savvy">Savvy</span></p>
-        <p className="mono-caption text-white/45 mt-1">AI AWARENESS</p>
+        <p className="font-display font-extrabold text-xl tracking-tight text-white">CyberXi <span className="text-grad-savvy">Savvy</span></p>
+        <p className="mono-caption text-white/45 mt-1" style={{ letterSpacing: '0.18em', color: '#1f8fff', opacity: 0.7 }}>AI AWARENESS</p>
       </div>
     </div>
   )
@@ -89,13 +89,29 @@ function NavItem({ to, label, icon }: { to: string; label: string; icon: string 
   return (
     <NavLink to={to} end={to === '/'}
       className={({ isActive }) => cn(
-        'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all',
-        isActive ? 'text-white glass' : 'text-white/60 hover:text-white hover:bg-white/5',
-      )}>
+        'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
+        isActive
+          ? 'text-white'
+          : 'text-white/55 hover:text-white hover:bg-white/5',
+      )}
+      style={({ isActive }) => isActive ? {
+        background: 'linear-gradient(90deg, rgba(0,229,138,0.10), transparent)',
+      } : undefined}
+    >
       {({ isActive }) => (
         <>
-          {isActive && <motion.span layoutId="nav-glow" className="absolute inset-y-1 right-0 w-1 rounded-full bg-savvy-grad" />}
-          <Icon className="h-[18px] w-[18px] shrink-0" />
+          {isActive && (
+            <motion.span
+              layoutId="nav-active-bar"
+              className="absolute inset-y-1 right-0 w-[3px] rounded-full"
+              style={{ background: 'linear-gradient(180deg, #00e58a, #1f8fff)' }}
+              transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+            />
+          )}
+          <Icon
+            className="h-[18px] w-[18px] shrink-0 transition-colors duration-200"
+            style={{ color: isActive ? '#00e58a' : undefined }}
+          />
           <span className="font-medium">{label}</span>
         </>
       )}
@@ -108,12 +124,18 @@ function LevelCard() {
   return (
     <div className="glass rounded-2xl p-4">
       <div className="flex items-center justify-between">
-        <span className="mono-caption text-cyber-400">LEVEL {ar(USER.level)}</span>
+        <span className="text-xs font-semibold tracking-widest text-cyber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>LEVEL {ar(USER.level)}</span>
         <span className="inline-flex items-center gap-1 text-xs text-gold-400"><Flame className="h-3.5 w-3.5" />{ar(USER.streakDays)} يوم</span>
       </div>
       <p className="mt-1 text-sm font-semibold text-white">{USER.levelTitle}</p>
-      <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-        <div className="h-full rounded-full bg-savvy-grad" style={{ width: `${pct}%` }} />
+      <div className="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
+        <motion.div
+          className="h-full rounded-full bg-savvy-grad"
+          style={{ boxShadow: '0 0 8px rgba(0,229,138,0.55)' }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] as const, delay: 0.4 }}
+        />
       </div>
       <p className="mt-1.5 text-[11px] text-white/45">{ar(USER.xp)} / {ar(USER.xpToNext)} XP</p>
     </div>
@@ -159,8 +181,11 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
     <header className="sticky top-0 z-30 glass-strong border-b border-white/8">
       <div className="flex items-center gap-3 px-5 sm:px-7 h-16 max-w-[1280px] mx-auto">
         <button onClick={onMenu} className="lg:hidden p-2 text-white/70"><Menu className="h-5 w-5" /></button>
-        <div className="hidden sm:flex items-center gap-2 glass rounded-xl px-3 py-2 w-full max-w-sm">
-          <Search className="h-4 w-4 text-white/40" />
+        <div
+          className="hidden sm:flex items-center gap-2 rounded-xl px-3 py-2 w-full max-w-sm transition-all duration-200 focus-within:border-cyber-500/40"
+          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
+        >
+          <Search className="h-4 w-4 text-white/40 shrink-0" />
           <input className="bg-transparent outline-none text-sm placeholder-white/35 w-full" placeholder="ابحث في المعرفة، الدروس، التحديات…" />
         </div>
         <div className="flex-1" />

@@ -57,12 +57,12 @@ export default function Dashboard() {
         >
           {/* ambient orbs */}
           <div
-            className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full blur-3xl"
-            style={{ background: 'radial-gradient(circle, rgba(31,143,255,0.18), transparent 70%)' }}
+            className="pointer-events-none absolute -top-32 -right-16 h-96 w-96 rounded-full blur-3xl"
+            style={{ background: 'radial-gradient(circle, rgba(31,143,255,0.22), transparent 65%)' }}
           />
           <div
-            className="pointer-events-none absolute -bottom-16 left-48 h-56 w-56 rounded-full blur-3xl"
-            style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.13), transparent 70%)' }}
+            className="pointer-events-none absolute bottom-0 left-32 h-64 w-64 rounded-full blur-2xl"
+            style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.16), transparent 70%)' }}
           />
 
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
@@ -177,13 +177,14 @@ export default function Dashboard() {
             />
 
             {/* sub-scores */}
-            {SCORES.map((s) => (
+            {SCORES.map((s, i) => (
               <div key={s.key} className="flex flex-col items-center gap-2">
                 <ScoreRing
                   value={s.value}
                   accent={s.color}
                   size={92}
                   stroke={8}
+                  delay={i * 0.07}
                 />
                 <span className="text-[11px] text-white/55 text-center max-w-[88px] leading-tight">
                   {s.label}
@@ -237,7 +238,7 @@ export default function Dashboard() {
                     sub={`${ar(pct)}٪ مكتمل`}
                     accent={accent}
                   />
-                  <ProgressBar value={pct} accent={accent} />
+                  <ProgressBar value={pct} accent={accent} delay={i * 0.07} />
                 </div>
               )
             })}
@@ -257,13 +258,23 @@ export default function Dashboard() {
               subtitle={`${ar(BADGES.filter(b => b.earned).length)} من ${ar(BADGES.length)} مكتسبة`}
             />
 
-            <div className="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-3 xl:grid-cols-5">
+            <motion.div
+              className="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-3 xl:grid-cols-5"
+              variants={{ show: { transition: { staggerChildren: 0.04, delayChildren: 0.1 } } }}
+              initial="hidden"
+              animate="show"
+            >
               {BADGES.map((badge) => {
                 const col = accentHex(badge.color)
                 return (
                   <motion.div
                     key={badge.id}
+                    variants={{
+                      hidden: { scale: 0.7, opacity: 0 },
+                      show: { scale: 1, opacity: 1, transition: { type: 'spring' as const, stiffness: 320, damping: 22 } },
+                    }}
                     whileHover={badge.earned ? { scale: 1.06 } : {}}
+                    transition={badge.earned ? { type: 'spring', stiffness: 420, damping: 22 } : undefined}
                     className="flex flex-col items-center gap-2"
                   >
                     <div
@@ -302,7 +313,7 @@ export default function Dashboard() {
                   </motion.div>
                 )
               })}
-            </div>
+            </motion.div>
           </GlassCard>
         </motion.div>
 

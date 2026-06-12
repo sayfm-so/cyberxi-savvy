@@ -101,8 +101,9 @@ function SavvyBubble({ text, isTyping }: { text: string; isTyping?: boolean }) {
       <div
         className="max-w-[78%] rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-relaxed text-white/90 whitespace-pre-line"
         style={{
-          background: 'linear-gradient(135deg, rgba(20,25,52,0.9), rgba(8,10,20,0.85))',
-          border: '1px solid rgba(255,255,255,0.10)',
+          background: 'linear-gradient(135deg, rgba(31,143,255,0.09), rgba(20,25,52,0.70))',
+          border: '1px solid rgba(31,143,255,0.18)',
+          borderRight: '3px solid rgba(0,229,138,0.50)',
           backdropFilter: 'blur(20px)',
         }}
       >
@@ -232,8 +233,9 @@ export default function AskSavvy() {
                 <div
                   className="rounded-2xl rounded-bl-sm px-4 py-3"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(20,25,52,0.9), rgba(8,10,20,0.85))',
-                    border: '1px solid rgba(255,255,255,0.10)',
+                    background: 'linear-gradient(135deg, rgba(31,143,255,0.09), rgba(20,25,52,0.70))',
+                    border: '1px solid rgba(31,143,255,0.18)',
+                    borderRight: '3px solid rgba(0,229,138,0.50)',
                   }}
                 >
                   <TypingDots />

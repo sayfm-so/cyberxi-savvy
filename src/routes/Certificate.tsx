@@ -117,7 +117,7 @@ function FauxQR({ size = 72 }: { size?: number }) {
 function RiyadhSkyline() {
   return (
     <svg
-      className="absolute bottom-0 left-0 right-0 w-full opacity-[0.045] pointer-events-none"
+      className="absolute bottom-0 left-0 right-0 w-full opacity-[0.07] pointer-events-none"
       viewBox="0 0 900 160" preserveAspectRatio="xMidYMax meet"
       fill="none"
     >
@@ -155,7 +155,7 @@ function RiyadhSkyline() {
 function GuillocheCorner({ className }: { className?: string }) {
   return (
     <svg
-      className={cn('absolute opacity-30 pointer-events-none', className)}
+      className={cn('absolute opacity-50 pointer-events-none', className)}
       width="80" height="80" viewBox="0 0 80 80"
     >
       <defs>
@@ -266,15 +266,15 @@ export default function Certificate() {
         <p className="mono-caption text-gold-400 mb-4">معاينة الشهادة</p>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.94, y: 24 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.92, y: 32 }}
+          animate={{ opacity: 1, scale: [0.92, 1.02, 1], y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as const, delay: 0.1 }}
         >
           {/* Certificate card — landscape, gold + blue, glassmorphism */}
           <div
             className="relative overflow-hidden rounded-3xl shadow-glow-gold"
             style={{
-              background: 'linear-gradient(135deg, rgba(14,18,38,0.97) 0%, rgba(8,12,28,0.98) 55%, rgba(16,20,44,0.96) 100%)',
+              background: 'linear-gradient(160deg, rgba(18,22,46,0.98) 0%, rgba(10,14,30,0.99) 45%, rgba(20,16,42,0.97) 100%)',
               border: '1px solid rgba(245,196,81,0.25)',
               minHeight: '420px',
             }}
@@ -286,15 +286,27 @@ export default function Certificate() {
             <GuillocheCorner className="top-0 right-0" />
             <GuillocheCorner className="bottom-0 left-0 rotate-180" />
 
-            {/* Top gold border stripe */}
-            <div
+            {/* Top gold border stripe — draws in from center like a wax seal */}
+            <motion.div
               className="absolute top-0 left-0 right-0 h-[3px]"
-              style={{ background: 'linear-gradient(90deg, transparent, #f5c451 30%, #ffe39a 50%, #f5c451 70%, transparent)' }}
+              style={{
+                background: 'linear-gradient(90deg, transparent, #f5c451 10%, #ffe39a 50%, #f5c451 90%, transparent)',
+                transformOrigin: 'center',
+              }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const, delay: 0.55 }}
             />
-            {/* Bottom gold border stripe */}
-            <div
+            {/* Bottom gold border stripe — draws in with same timing */}
+            <motion.div
               className="absolute bottom-0 left-0 right-0 h-[3px]"
-              style={{ background: 'linear-gradient(90deg, transparent, #e0a92e 30%, #f5c451 50%, #e0a92e 70%, transparent)' }}
+              style={{
+                background: 'linear-gradient(90deg, transparent, #e0a92e 10%, #f5c451 50%, #e0a92e 90%, transparent)',
+                transformOrigin: 'center',
+              }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const, delay: 0.65 }}
             />
 
             {/* ── Certificate content ── */}
@@ -303,7 +315,13 @@ export default function Certificate() {
               {/* Header: branding + MrSavvy seal */}
               <div className="flex items-start justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
-                  <MrSavvy size={56} float={false} />
+                  {/* One-shot congratulatory bob on mount */}
+                  <motion.div
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 0.8, delay: 1.2, ease: [0.16, 1, 0.3, 1] as const }}
+                  >
+                    <MrSavvy size={56} float={false} />
+                  </motion.div>
                   <div>
                     <p className="text-grad-gold font-bold text-lg leading-tight">CyberXi Savvy</p>
                     <p className="text-white/50 text-xs mt-0.5 mono-caption tracking-widest">CERTIFIED PROGRAM</p>
@@ -413,13 +431,14 @@ export default function Certificate() {
 
                   {/* QR + verification */}
                   <div
-                    className="flex flex-col items-center gap-2 rounded-2xl p-3"
+                    className="flex flex-col items-center gap-2 rounded-2xl p-4"
                     style={{
-                      background: 'rgba(245,196,81,0.06)',
-                      border: '1px solid rgba(245,196,81,0.18)',
+                      background: 'rgba(245,196,81,0.08)',
+                      border: '1px solid rgba(245,196,81,0.28)',
+                      boxShadow: 'inset 0 1px 0 rgba(255,227,154,0.10)',
                     }}
                   >
-                    <FauxQR size={72} />
+                    <FauxQR size={96} />
                     <p className="mono-caption text-gold-500 text-center">تحقّق من الشهادة</p>
                     <p className="text-white/30 text-[10px] font-mono text-center">verify.cyberxi.sa</p>
                   </div>

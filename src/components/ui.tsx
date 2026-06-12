@@ -59,8 +59,8 @@ export function Pill({ children, accent = 'cyber', className }:
 }
 
 /** Circular progress ring with centered value. */
-export function ScoreRing({ value, label, accent = 'cyber', size = 120, stroke = 9 }:
-  { value: number; label?: string; accent?: Accent; size?: number; stroke?: number }) {
+export function ScoreRing({ value, label, accent = 'cyber', size = 120, stroke = 9, delay = 0 }:
+  { value: number; label?: string; accent?: Accent; size?: number; stroke?: number; delay?: number }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   const off = c * (1 - value / 100)
@@ -73,7 +73,7 @@ export function ScoreRing({ value, label, accent = 'cyber', size = 120, stroke =
           <motion.circle
             cx={size / 2} cy={size / 2} r={r} fill="none" stroke={col} strokeWidth={stroke} strokeLinecap="round"
             strokeDasharray={c} initial={{ strokeDashoffset: c }} whileInView={{ strokeDashoffset: off }}
-            viewport={{ once: true }} transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] as const }}
+            viewport={{ once: true }} transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] as const, delay }}
             style={{ filter: `drop-shadow(0 0 6px ${col}aa)` }}
           />
         </svg>
@@ -87,14 +87,14 @@ export function ScoreRing({ value, label, accent = 'cyber', size = 120, stroke =
 }
 
 /** Linear progress bar. */
-export function ProgressBar({ value, accent = 'cyber', className }:
-  { value: number; accent?: Accent; className?: string }) {
+export function ProgressBar({ value, accent = 'cyber', className, delay = 0 }:
+  { value: number; accent?: Accent; className?: string; delay?: number }) {
   const col = HEX[accent]
   return (
     <div className={cn('h-2 rounded-full bg-white/8 overflow-hidden', className)}>
       <motion.div className="h-full rounded-full" style={{ background: col, boxShadow: `0 0 10px ${col}` }}
         initial={{ width: 0 }} whileInView={{ width: `${value}%` }} viewport={{ once: true }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as const }} />
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as const, delay }} />
     </div>
   )
 }

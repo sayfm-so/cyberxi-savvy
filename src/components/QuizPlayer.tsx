@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion'
 import { X, CheckCircle2, XCircle, ArrowLeft, RotateCcw, Trophy } from 'lucide-react'
 import type { QuizDef } from '../data'
 import { MrSavvy } from './MrSavvy'
@@ -55,7 +55,7 @@ export function QuizPlayer({ quiz, onClose }: { quiz: QuizDef; onClose: (passed:
             </div>
 
             <AnimatePresence mode="wait">
-              <motion.div key={i} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.3 }}>
+              <motion.div key={i} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}>
                 <h2 className="text-xl font-bold text-white leading-snug mb-5">{q.q}</h2>
                 <div className="grid gap-3">
                   {q.options.map((opt, idx) => {
@@ -66,13 +66,26 @@ export function QuizPlayer({ quiz, onClose }: { quiz: QuizDef; onClose: (passed:
                       : isCorrect ? 'border-savvy-500 bg-savvy-500/10 text-savvy-300'
                       : isPicked ? 'border-danger-500 bg-danger-500/10 text-danger-300'
                       : 'border-white/5 bg-white/5 opacity-50'
+                    // animate correct: bounce; wrong: shake
+                    const answerAnim = answered && isPicked
+                      ? isCorrect
+                        ? { scale: [1, 1.06, 1] }
+                        : { x: [0, -6, 6, -4, 4, 0] }
+                      : {}
+                    const answerTrans = answered && isPicked
+                      ? isCorrect
+                        ? { type: 'spring' as const, stiffness: 400, damping: 20 }
+                        : { duration: 0.35, ease: 'easeInOut' as const }
+                      : {}
                     return (
-                      <button key={idx} onClick={() => choose(idx)} disabled={answered}
+                      <motion.button key={idx} onClick={() => choose(idx)} disabled={answered}
+                        animate={answerAnim}
+                        transition={answerTrans}
                         className={cn('w-full text-start p-4 rounded-xl border text-sm sm:text-base text-white transition-all flex items-center justify-between gap-3', cls)}>
                         <span>{opt}</span>
                         {answered && isCorrect && <CheckCircle2 className="h-5 w-5 text-savvy-400 shrink-0" />}
                         {answered && isPicked && !isCorrect && <XCircle className="h-5 w-5 text-danger-400 shrink-0" />}
-                      </button>
+                      </motion.button>
                     )
                   })}
                 </div>
@@ -106,10 +119,45 @@ export function QuizPlayer({ quiz, onClose }: { quiz: QuizDef; onClose: (passed:
   )
 }
 
+/* Static confetti particle data — generated once, deterministic */
+const CONFETTI_PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  x: (Math.sin(i * 2.4) * 160),
+  y: -(60 + (i % 5) * 28),
+  rotate: i * 51,
+  size: 6 + (i % 3) * 3,
+  delay: i * 0.055,
+  duration: 0.9 + (i % 4) * 0.15,
+}))
+
 function Result({ quiz, scorePct, correct, total, passed, onRetry, onClose }:
   { quiz: QuizDef; scorePct: number; correct: number; total: number; passed: boolean; onRetry: () => void; onClose: () => void }) {
+  /* Score count-up */
+  const count = useMotionValue(0)
+  const displayScore = useTransform(count, (v) => ar(Math.round(v)))
+  const hasAnimated = useRef(false)
+
+  useEffect(() => {
+    if (hasAnimated.current) return
+    hasAnimated.current = true
+    const controls = animate(count, scorePct, { duration: 1.2, ease: [0.16, 1, 0.3, 1] })
+    return controls.stop
+  }, [count, scorePct])
+
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-4">
+    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative text-center py-4 overflow-hidden">
+      {/* Gold confetti burst — pass only */}
+      {passed && CONFETTI_PARTICLES.map((p) => (
+        <motion.div
+          key={p.id}
+          className="pointer-events-none absolute left-1/2 top-1/3 rounded-sm"
+          style={{ width: p.size, height: p.size, background: '#f5c451', originX: '50%', originY: '50%' }}
+          initial={{ x: 0, y: 0, opacity: 1, rotate: p.rotate, scale: 1 }}
+          animate={{ x: p.x, y: p.y, opacity: 0, rotate: p.rotate + 180, scale: 0.4 }}
+          transition={{ duration: p.duration, delay: p.delay, ease: [0.16, 1, 0.3, 1] as const }}
+        />
+      ))}
+
       <motion.div initial={{ scale: 0.6, rotate: -10 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 160, damping: 12 }}
         className={cn('mx-auto grid h-24 w-24 place-items-center rounded-3xl mb-5', passed ? 'bg-savvy-500/15 text-savvy-400 shadow-glow-savvy' : 'bg-gold-500/15 text-gold-400 shadow-glow-gold')}>
         {passed ? <Trophy className="h-12 w-12" /> : <RotateCcw className="h-12 w-12" />}
@@ -117,7 +165,10 @@ function Result({ quiz, scorePct, correct, total, passed, onRetry, onClose }:
       <h2 className="text-2xl font-bold text-white">{passed ? 'أحسنت! اجتزت الاختبار' : 'قريب من النجاح'}</h2>
       <p className="mt-1 text-white/60">{quiz.title}</p>
       <div className="my-6">
-        <span className={cn('text-6xl font-bold tabular-nums', passed ? 'text-grad-savvy' : 'text-grad-gold')}>{ar(scorePct)}<span className="text-3xl">٪</span></span>
+        <span className={cn('text-6xl font-bold tabular-nums', passed ? 'text-grad-savvy' : 'text-grad-gold')}>
+          <motion.span>{displayScore}</motion.span>
+          <span className="text-3xl">٪</span>
+        </span>
         <p className="mt-1 text-sm text-white/55">{ar(correct)} من {ar(total)} إجابات صحيحة · النجاح ٨٠٪</p>
       </div>
       <div className="flex items-center justify-center gap-3">
